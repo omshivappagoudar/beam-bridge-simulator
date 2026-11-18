@@ -1,6 +1,16 @@
 class BeamProperties:
 
     def __init__(self, pieces):
+        """
+        pieces = [
+            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 1
+            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 2
+            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 3
+            ...
+            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)} # Piece N
+        ]
+        """
+
         # Each instance stores its own copy of the pieces
         self._pieces = [piece.copy() for piece in pieces]
 
@@ -36,7 +46,7 @@ class BeamProperties:
             y = piece["y"]
 
             area = b * h
-            I_local = b * h**3 / 12
+            I_local = b * h**3 / 12.0
 
             I += I_local + area * (y - self.y_bar)**2
 
