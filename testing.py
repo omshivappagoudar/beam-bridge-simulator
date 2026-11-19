@@ -1,4 +1,4 @@
-from main import TRAIN_POINT_LOAD_LOCATIONS
+from constants_and_conventions import *
 from beam_properties import *
 from analyze_FBD import *
 
@@ -83,14 +83,7 @@ def test_AnalyzeFBD_class():
 
     # ===== TEST CASE =====
     # CIV102 Bridge Design Project Deliverable 1 - Question 3 (Base Case Loading; 452 N)
-    train_loads = [
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[0], "P": -67.5}, # Location B1; P in Newtons
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[1], "P": -67.5}, # Location B2; P in Newtons
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[2], "P": -67.5}, # Location B3; P in Newtons
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[3], "P": -67.5}, # Location B4; P in Newtons
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[4], "P": -91.0}, # Location B5; P in Newtons
-        {"x": TRAIN_POINT_LOAD_LOCATIONS[5], "P": -91.0}, # Location B6; P in Newtons
-    ]
+    train_loads = [-67.5, -67.5, -67.5, -67.5, -91.0, -91.0]
     train_location = 172
     FBD_analysis = AnalyzeFBD(train_loads, train_location)
 
@@ -113,7 +106,7 @@ def test_AnalyzeFBD_class():
     verify_response(
         test_suite_name = "AnalyzeFBD Class",
         test_name = "Base Case Loading Shear Force Diagram at x = 600 mm",
-        response = FBD_analysis._shear_force_diagram[600],
+        response = FBD_analysis.shear_force_diagram[600],
         expected_response = 10.20,
         threshold = 0.01
     )
@@ -121,7 +114,7 @@ def test_AnalyzeFBD_class():
     verify_response(
         test_suite_name = "AnalyzeFBD Class",
         test_name = "Base Case Loading Bending Moment Diagram at x = 852 mm",
-        response = FBD_analysis._bending_moment_diagram[852],
+        response = FBD_analysis.bending_moment_diagram[852],
         expected_response = 67300.0,
         threshold = 0.01
     )
