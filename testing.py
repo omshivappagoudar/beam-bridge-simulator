@@ -53,28 +53,28 @@ def test_BeamProperties_class(): # Test Cases for beam_properties.py
         {"b": 1.27, "h": 75 - 2 * 1.27, "y": 75 / 2}, # Piece 5
         {"b": 80, "h": 1.27, "y": 1.27 / 2}, # Piece 6
     ]
-    beam_properties = BeamProperties(pieces)
+    cross_section_analysis = CrossSectionAnalysis(pieces)
 
     verify_response(
-        test_suite_name = "BeamProperties Class",
+        test_suite_name = "CrossSectionAnalysis Class",
         test_name = "Design 0 Area",
-        response = beam_properties.area,
+        response = cross_section_analysis.area,
         expected_response = 428.57,
         threshold = 0.01
     )
 
     verify_response(
-        test_suite_name = "BeamProperties Class",
+        test_suite_name = "CrossSectionAnalysis Class",
         test_name = "Design 0 Centroid",
-        response = beam_properties.centroid,
+        response = cross_section_analysis.centroid,
         expected_response = 41.431,
         threshold = 0.01
     )
 
     verify_response(
-        test_suite_name = "BeamProperties Class",
+        test_suite_name = "CrossSectionAnalysis Class",
         test_name = "Design 0 Moment of Inertia",
-        response = beam_properties.moment_of_inertia,
+        response = cross_section_analysis.moment_of_inertia,
         expected_response = 418352.21,
         threshold = 0.01
     )

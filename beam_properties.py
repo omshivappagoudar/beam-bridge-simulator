@@ -1,20 +1,51 @@
-class BeamProperties:
+"""
+
+DOCUMENTATION OF THE CrossSectionAnalysis CLASS.
+
+===== CONSTRUCTOR INPUTS =====
+
+pieces = [
+    {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 1
+    {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 2
+    {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 3
+    ...
+    {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)} # Piece N
+]
+
+"""
+
+class CrossSectionAnalysis:
 
     def __init__(self, pieces):
-        """
-        pieces = [
-            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 1
-            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 2
-            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)}, # Piece 3
-            ...
-            {"b": base (mm), "h": height (mm), "y": distance from bottom (mm)} # Piece N
-        ]
-        """
-
         self._pieces = pieces
         self.area = self._calculate_area()
         self.centroid = self._calculate_centroid()
         self.moment_of_inertia = self._calculate_moment_of_inertia()
+        self._calculate_cross_section_height()
+        self._calculate_weakest_y_with_respect_to_shear_stress()
+
+    def get_area(self):
+        return self.area
+
+    def get_centroid(self):
+        return self.centroid
+
+    def get_moment_of_inertia(self):
+        return self.moment_of_inertia
+
+    def calculate_shear_stress(self, V, y): # tau_xy = VQ/Ib, in MPa
+        return V * self._calculate_Q(y) / (self.moment_of_inertia * self._calculate_total_intersection(y))
+
+    def calculate_greatest_shear_stress_information(self, V):
+        return {"tau_xy": self.calculate_shear_stress(V, self._shear_weakest_y), "y": self._shear_weakest_y}
+
+    def calculate_maximum_tensile_stress(self, M):
+        y = self.centroid
+        return M * y / self.moment_of_inertia
+
+    def calculate_maximum_compressive_stress(self, M):
+        y = self._max_height - self.centroid
+        return M * y / self.moment_of_inertia
 
     def _calculate_area(self):
         total_area = 0
@@ -40,3 +71,33 @@ class BeamProperties:
             I_local = b * (h ** 3) / 12
             I += I_local + area * ((y - self.centroid) ** 2)
         return I
+    
+    def _calculate_total_intersection(self, y): # in mm; the total length of the intersection of the beam with the horizontal line at height y
+        total_intersection = 0
+        for piece in self._pieces:
+            deviation = y - piece["y"]
+            if -piece["h"] / 2 - 1e-10 < deviation and deviation <= 0:
+                total_intersection += piece["b"]
+            elif 0 < deviation and deviation <= piece["h"] / 2 - 1e-10:
+                total_intersection += piece["b"]
+        return total_intersection
+
+    def _calculate_Q(self, y):
+        Q = 0
+        for y_current in range(0, y):
+            Q += (y_current - self.get_centroid()) * self._calculate_total_intersection(y_current)
+        return Q
+
+    def _calculate_cross_section_height(self):
+        self._max_height = 0
+        for piece in self._pieces:
+            self._max_height = max(self._max_height, piece["y"] + piece["h"] / 2)
+
+    def _calculate_weakest_y_with_respect_to_shear_stress(self):
+        self._shear_weakest_y = 0
+        weakest_Qb = 0
+        for y in range(0, int(self._max_height + 1)):
+            Qb_ratio = self._calculate_Q(y) / self._calculate_total_intersection(y)
+            if abs(Qb_ratio) > weakest_Qb:
+                self._shear_weakest_y = y
+                weakest_Qb = Qb_ratio

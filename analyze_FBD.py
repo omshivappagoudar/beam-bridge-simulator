@@ -1,4 +1,5 @@
 from constants_and_conventions import *
+from initialization import cross_section
 
 """
 
@@ -67,17 +68,41 @@ class AnalyzeFBD:
         self._calculate_bending_moment_diagram()
         self._calculate_extreme_values()
 
+    # ===== VALUES AT A SPECIFIC beam_x =====
+
     def get_shear_force(self, beam_x):
         return self.shear_force_diagram[beam_x]
 
     def get_bending_moment(self, beam_x):
         return self.bending_moment_diagram[beam_x]
 
+    def get_maximum_shear_stress_at_beam_x(self, beam_x):
+        return cross_section.calculate_greatest_shear_stress_information(self.get_shear_force(beam_x))
+
+    def get_maximum_tensile_stress_at_beam_x(self, beam_x):
+        return cross_section.calculate_maximum_tensile_stress(self.get_bending_moment(beam_x))
+
+    def get_maximum_compressive_stress_at_beam_x(self, beam_x):
+        return cross_section.calculate_maximum_compressive_stress(self.get_bending_moment(beam_x))
+
+    # ===== EXTREME VALUES OVER THE ENTIRE BEAM =====
+
     def get_greatest_shear_force_information(self):
         return self._greatest_shear_force_information
 
     def get_greatest_bending_moment_information(self):
         return self._greatest_bending_moment_information
+
+    def get_greatest_shear_stress_information(self):
+        return self._greatest_shear_stress_information
+
+    def get_greatest_tensile_stress_information(self):
+        return self._greatest_tensile_stress_information
+
+    def get_greatest_compressive_stress_information(self):
+        return self._greatest_compressive_stress_information
+
+    # ===== PRIVATE HELPER FUNCTIONS =====
 
     def _calculate_point_loads(self):
         self._point_loads = []
@@ -119,15 +144,45 @@ class AnalyzeFBD:
         for beam_x in range(1, (BRIDGE_LENGTH + 1)):
             self.bending_moment_diagram.append(self.bending_moment_diagram[-1] + self.shear_force_diagram[beam_x - 1])
 
+    def _calculate_maximum_shear_stress_diagram(self):
+        self.maximum_shear_stress_diagram = [0] * 1201
+        for beam_x in range(1, (BRIDGE_LENGTH + 1)):
+            self.maximum_shear_stress_diagram[beam_x] = self.get_maximum_shear_stress_at_beam_x(beam_x)
+
+    def _calculate_maximum_tensile_stress_diagram(self):
+        self.maximum_tensile_stress_diagram = [0] * 1201
+        for beam_x in range(1, (BRIDGE_LENGTH + 1)):
+            self.maximum_tensile_stress_diagram[beam_x] = self.get_maximum_tensile_stress_at_beam_x(beam_x)
+
+    def _calculate_maximum_compressive_stress_diagram(self):
+        self.maximum_compressive_stress_diagram = [0] * 1201
+        for beam_x in range(1, (BRIDGE_LENGTH + 1)):
+            self.maximum_compressive_stress_diagram[beam_x] = self.get_maximum_compressive_stress_at_beam_x(beam_x)
+    
     def _calculate_extreme_values(self):
         self._greatest_shear_force_information = {"V": 0, "beam_x": 0}
         self._greatest_bending_moment_information = {"M": 0, "beam_x": 0}
+        self._greatest_shear_stress_information = {"tau_xy": 0, "beam_x": 0}
+        self._greatest_tensile_stress_information = {"sigma_t": 0, "beam_x": 0}
+        self._greatest_compressive_stress_information = {"sigma_c": 0, "beam_x": 0}
         for beam_x in range(0, 1201):
-            shear = self.get_shear_force(beam_x)
+            shear_force = self.get_shear_force(beam_x)
             bending_moment = self.get_bending_moment(beam_x)
-            if abs(shear) > abs(self._greatest_shear_force_information["V"]):
-                self._greatest_shear_force_information["V"] = shear
+            shear_stress = self.get_maximum_shear_stress_at_beam_x(beam_x)["tau_xy"]
+            tensile_stress = self.get_maximum_tensile_stress_at_beam_x(beam_x)
+            compressive_stress = self.get_maximum_compressive_stress_at_beam_x(beam_x)
+            if abs(shear_force) > abs(self._greatest_shear_force_information["V"]):
+                self._greatest_shear_force_information["V"] = shear_force
                 self._greatest_shear_force_information["beam_x"] = beam_x
             if abs(bending_moment) > abs(self._greatest_bending_moment_information["M"]):
                 self._greatest_bending_moment_information["M"] = bending_moment
                 self._greatest_bending_moment_information["beam_x"] = beam_x
+            if abs(shear_stress) > abs(self._greatest_shear_stress_information["tau_xy"]):
+                self._greatest_shear_stress_information["tau_xy"] = shear_stress
+                self._greatest_shear_stress_information["beam_x"] = beam_x
+            if abs(tensile_stress) > abs(self._greatest_tensile_stress_information["sigma_t"]):
+                self._greatest_tensile_stress_information["sigma_t"] = tensile_stress
+                self._greatest_tensile_stress_information["beam_x"] = beam_x
+            if abs(compressive_stress) > abs(self._greatest_compressive_stress_information["sigma_c"]):
+                self._greatest_compressive_stress_information["sigma_c"] = compressive_stress
+                self._greatest_compressive_stress_information["beam_x"] = beam_x
