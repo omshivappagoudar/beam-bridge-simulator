@@ -29,6 +29,16 @@ class PassageSimulation:
         self._end_train_x = end_train_x
         self._analyze_passage()
         self._calculate_extreme_values()
+        self.report_analysis()
+
+    def report_analysis(self):
+        print("===== REPORT =====")
+        print()
+        self._print_loading_case()
+        print()
+        self._print_cross_section_analysis()
+        print()
+        self._print_maximum_stresses()
 
     def get_frame_analysis(self, train_x):
         return self.passage_analysis[train_x]
@@ -65,9 +75,9 @@ class PassageSimulation:
     def _calculate_extreme_values(self):
         self._greatest_shear_force_information = {"V": 0, "beam_x": 0, "train_x": 0}
         self._greatest_bending_moment_information = {"M": 0, "beam_x": 0, "train_x": 0}
-        self._greatest_shear_stress_information = {"tau_xy": 0, "beam_x": 0, "train_x": 0}
-        self._greatest_tensile_stress_information = {"sigma_t": 0, "beam_x": 0, "train_x": 0}
-        self._greatest_compressive_stress_information = {"sigma_c": 0, "beam_x": 0, "train_x": 0}
+        self._greatest_shear_stress_information = {"tau_xy": 0, "beam_x": 0, "train_x": 0, "FOS": 0}
+        self._greatest_tensile_stress_information = {"sigma_t": 0, "beam_x": 0, "train_x": 0, "FOS": 0}
+        self._greatest_compressive_stress_information = {"sigma_c": 0, "beam_x": 0, "train_x": 0, "FOS": 0}
         for train_x in range(self._start_train_x, self._end_train_x):
             passage_analysis = self.passage_analysis[train_x]
             train_x_greatest_shear_force_information = passage_analysis.get_greatest_shear_force_information()
@@ -95,3 +105,39 @@ class PassageSimulation:
                 self._greatest_compressive_stress_information["sigma_c"] = train_x_greatest_compressive_stress_information["sigma_c"]
                 self._greatest_compressive_stress_information["beam_x"] = train_x_greatest_compressive_stress_information["beam_x"]
                 self._greatest_compressive_stress_information["train_x"] = train_x
+        self._greatest_shear_stress_information["FOS"] = CONTACT_CEMENT_SHEAR_FAILURE_STRESS / self._greatest_shear_stress_information["tau_xy"]
+        self._greatest_tensile_stress_information["FOS"] = MATBOARD_TENSILE_FAILURE_STRESS / self._greatest_tensile_stress_information["sigma_t"]
+        self._greatest_compressive_stress_information["FOS"] = MATBOARD_COMPRESSIVE_FAILURE_STRESS / self._greatest_compressive_stress_information["sigma_c"]
+
+    def _print_loading_case(self):
+        print("LOADING CASE TESTED.")
+        print(f"Left Cart Weight: {-(self._loading_case[0] + self._loading_case[1]):.2f} N")
+        print(f"Center Cart Weight: {-(self._loading_case[2] + self._loading_case[3]):.2f} N")
+        print(f"Right Cart Weight: {-(self._loading_case[4] + self._loading_case[5]):.2f} N")
+
+    def _print_cross_section_analysis(self):
+        print("CROSS SECTION ANALYSIS.")
+        print(f"Cross-sectional Area: {cross_section.area:.2f} mm^2")
+        print(f"Cross-sectional Centroid: {cross_section.centroid:.2f} mm from the bottom")
+        print(f"Cross-sectional Moment of Inertia: {cross_section.moment_of_inertia:.2f} mm^4")
+
+    def _print_maximum_stresses(self):
+        print("TENSILE STRESS ANALYSIS.")
+        print(f"Maximum Tensile Stress During Train Passage: {self._greatest_tensile_stress_information["sigma_t"]:.2f} MPa")
+        print(f"Train Location Inducing Maximum Tensile Stress: Left-most wheel {self._greatest_tensile_stress_information["train_x"]:.2f} mm from the center of the left support")
+        print(f"Beam Location Experiencing Maximum Tensile Stress: {self._greatest_tensile_stress_information["beam_x"]:.2f} mm from the center of the left support")
+        print(f"Factor of Safety Against Tensile Failure: {self._greatest_tensile_stress_information["FOS"]:.2f}")
+        print()
+        print("COMPRESSIVE STRESS ANALYSIS.")
+        print(f"Maximum Compressive Stress During Train Passage: {self._greatest_compressive_stress_information["sigma_c"]:.2f} MPa")
+        print(f"Train Location Inducing Maximum Compressive Stress: Left-most wheel {self._greatest_compressive_stress_information["train_x"]:.2f} mm from the center of the left support")
+        print(f"Beam Location Experiencing Maximum Compressive Stress: {self._greatest_compressive_stress_information["beam_x"]:.2f} mm from the center of the left support")
+        print(f"Factor of Safety Against Compressive Failure: {self._greatest_compressive_stress_information["FOS"]:.2f}")
+        print()
+        print("SHEAR STRESS ANALYSIS.")
+        print(f"Maximum Shear Stress During Train Passage: {self._greatest_shear_stress_information["tau_xy"]:.2f} MPa")
+        print(f"Train Location Inducing Maximum Shear Stress: Left-most wheel {self._greatest_shear_stress_information["train_x"]:.2f} mm from the center of the left support")
+        print(f"Beam Location Experiencing Maximum Shear Stress: {self._greatest_shear_stress_information["beam_x"]:.2f} mm from the center of the left support")
+        print(f"Cross-sectional Beam Elevation Experiencing Maximum Shear Stress: {cross_section._shear_weakest_y:.2f} mm from the bottom")
+        print(f"Factor of Safety Against Shear Failure: {self._greatest_shear_stress_information["FOS"]:.2f}, assuming failure at 2 MPa")
+        print()

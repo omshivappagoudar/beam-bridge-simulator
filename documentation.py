@@ -11,10 +11,10 @@ loading_case_generator = GenerateLoadingCases()
 loading_case = loading_case_generator.loading_cases[0]
 
 # Simulating a train passage between only a start and end location
-# passage_simulation = PassageSimulation(loading_case, start_train_x = 165, end_train_x = 175)
+passage_simulation = PassageSimulation(loading_case, start_train_x = 165, end_train_x = 175)
 
 # Simulating an entire train passage (This takes about 5 minutes to complete)
-passage_simulation = PassageSimulation(loading_case)
+# passage_simulation = PassageSimulation(loading_case)
 
 print("\n===== OUTPUTS =====")
 
@@ -39,7 +39,7 @@ print("4. train_x = 172, beam_x = 1028 => sigma_tensile_max(beam_x):", passage_s
 print("5. train_x = 172, beam_x = 1028 => sigma_compressive_max(beam_x):", passage_simulation.get_frame_analysis(train_x = 172).get_maximum_compressive_stress_at_beam_x(beam_x = 1028))
 
 
-# ===== SPECIFIC TRAIN LOCATION, RETRIEVING AN EXTREME VALUE OVER THE ENTIRE BEAM =====
+# ===== SPECIFIC TRAIN LOCATION, RETRIEVING A MAXIMUM VALUE OVER THE ENTIRE BEAM =====
 
 # Getting the greatest V, in magnitude, along the entire beam at a specific train location (train_x = 172)
 print("6. train_x = 172 => V_max:", passage_simulation.get_frame_analysis(train_x = 172).get_greatest_shear_force_information())
@@ -60,7 +60,7 @@ print("9. train_x = 172 => sigma_tensile_max:", passage_simulation.get_frame_ana
 print("10. train_x = 172 => sigma_compressive_max:", passage_simulation.get_frame_analysis(train_x = 172).get_greatest_compressive_stress_information())
 
 
-# ===== RETRIEVING AN EXTREME VALUE OVER THE ENTIRE TRAIN PASSAGE =====
+# ===== RETRIEVING A MAXIMUM VALUE OVER THE ENTIRE TRAIN PASSAGE =====
 
 # Getting the greatest V, in magnitude, throughout the entire train passage
 print("11. Greatest Shear Force V During Train Passage:", passage_simulation.get_greatest_shear_force_information())
