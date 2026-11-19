@@ -1,9 +1,3 @@
-# ===== SIGN CONVENTIONS =====
-"""
-(Forces) Upward forces are positive, downward forces are negative.
-(Moments) Counter-clockwise moments are positive, clockwise moments are negative.
-"""
-
 # ===== MATERIAL PROPERTIES =====
 BRIDGE_LENGTH = 1200                        # mm
 MATBOARD_YOUNGS_MODULUS = 4000              # MPa

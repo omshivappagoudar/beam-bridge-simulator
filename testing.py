@@ -1,4 +1,4 @@
-from constants_and_conventions import *
+from constants import *
 from beam_properties import *
 from analyze_FBD import *
 

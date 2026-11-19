@@ -1,4 +1,4 @@
-from constants_and_conventions import *
+from constants import *
 from initialization import cross_section
 
 """
@@ -112,7 +112,7 @@ class AnalyzeFBD:
             if point_load_location >= 0.01 and point_load_location <= BRIDGE_LENGTH - 0.01:
                 self._point_loads.append({
                     "beam_x": point_load_location,
-                    "P": point_load_force
+                    "P": -point_load_force
                 })
 
     def _calculate_reactions(self):

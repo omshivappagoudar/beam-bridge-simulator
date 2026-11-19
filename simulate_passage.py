@@ -1,5 +1,5 @@
 from analyze_FBD import *
-from constants_and_conventions import *
+from constants import *
 import time
 
 """
@@ -108,9 +108,9 @@ class PassageSimulation:
 
     def _print_loading_case(self):
         print("LOADING CASE TESTED.")
-        print(f"Left Cart Weight: {-(self._loading_case[0] + self._loading_case[1]):.2f} N")
-        print(f"Center Cart Weight: {-(self._loading_case[2] + self._loading_case[3]):.2f} N")
-        print(f"Right Cart Weight: {-(self._loading_case[4] + self._loading_case[5]):.2f} N")
+        print(f"Left Cart Weight: {self._loading_case[0] + self._loading_case[1]:.2f} N")
+        print(f"Center Cart Weight: {self._loading_case[2] + self._loading_case[3]:.2f} N")
+        print(f"Right Cart Weight: {self._loading_case[4] + self._loading_case[5]:.2f} N")
 
     def _print_cross_section_analysis(self):
         print("CROSS SECTION ANALYSIS.")
