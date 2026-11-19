@@ -23,16 +23,18 @@ self._greatest_bending_moment_information = {"M": __, "beam_x": __, "train_x": _
 
 class PassageSimulation:
 
-    def __init__(self, loading_case, start_train_x = -TRAIN_LENGTH, end_train_x = BRIDGE_LENGTH):
+    def __init__(self, loading_case, trial_number, start_train_x = -TRAIN_LENGTH, end_train_x = BRIDGE_LENGTH):
         self._loading_case = loading_case
+        self._trial_number = trial_number
         self._start_train_x = start_train_x
         self._end_train_x = end_train_x
         self._analyze_passage()
         self._calculate_extreme_values()
+        self._package_FOS()
         self.report_analysis()
 
     def report_analysis(self):
-        print("\n\n===== REPORT =====")
+        print(f"\n\n\033[1m===== REPORT: TRIAL {self._trial_number} =====\033[0m")
         print()
         self._print_loading_case()
         print()
@@ -65,9 +67,9 @@ class PassageSimulation:
             self.passage_analysis[train_x] = AnalyzeFBD(self._loading_case, train_x)
 
             percentage = (train_x - (-TRAIN_LENGTH)) / (BRIDGE_LENGTH - (-TRAIN_LENGTH)) * 100
-            if train_x % 100 == 0: print(f"Analysis is {percentage:.2f}% complete.")
+            # if train_x % 100 == 0: print(f"Analysis is {percentage:.2f}% complete.")
         whole_end = time.time()
-        print(f"Finished analyzing the passage from train_x = {self._start_train_x} mm to train_x = {self._end_train_x} mm. Total computation time: {whole_end - whole_start:.2f} seconds.")
+        # print(f"Finished analyzing the passage from train_x = {self._start_train_x} mm to train_x = {self._end_train_x} mm. Total computation time: {whole_end - whole_start:.2f} seconds.")
 
     def _calculate_extreme_values(self):
         self._greatest_shear_force_information = {"V": 0, "beam_x": 0, "train_x": 0}
@@ -102,9 +104,9 @@ class PassageSimulation:
                 self._greatest_compressive_stress_information["sigma_c"] = train_x_greatest_compressive_stress_information["sigma_c"]
                 self._greatest_compressive_stress_information["beam_x"] = train_x_greatest_compressive_stress_information["beam_x"]
                 self._greatest_compressive_stress_information["train_x"] = train_x
-        self._greatest_shear_stress_information["FOS"] = CONTACT_CEMENT_SHEAR_FAILURE_STRESS / self._greatest_shear_stress_information["tau_xy"]
-        self._greatest_tensile_stress_information["FOS"] = MATBOARD_TENSILE_FAILURE_STRESS / self._greatest_tensile_stress_information["sigma_t"]
-        self._greatest_compressive_stress_information["FOS"] = MATBOARD_COMPRESSIVE_FAILURE_STRESS / self._greatest_compressive_stress_information["sigma_c"]
+        self._greatest_shear_stress_information["FOS"] = abs(CONTACT_CEMENT_SHEAR_FAILURE_STRESS / self._greatest_shear_stress_information["tau_xy"])
+        self._greatest_tensile_stress_information["FOS"] = abs(MATBOARD_TENSILE_FAILURE_STRESS / self._greatest_tensile_stress_information["sigma_t"])
+        self._greatest_compressive_stress_information["FOS"] = abs(MATBOARD_COMPRESSIVE_FAILURE_STRESS / self._greatest_compressive_stress_information["sigma_c"])
 
     def _print_loading_case(self):
         print("LOADING CASE TESTED.")
@@ -118,23 +120,36 @@ class PassageSimulation:
         print(f"Cross-sectional Centroid: {cross_section.centroid:.2f} mm from the bottom")
         print(f"Cross-sectional Moment of Inertia: {cross_section.moment_of_inertia:.2f} mm^4")
 
+    def _FOS_color(self, FOS):
+        if FOS < 1:
+            return "\033[1;31m"
+        else:
+            return "\033[1;32m"
+
     def _print_maximum_stresses(self):
         print("TENSILE STRESS ANALYSIS.")
         print(f"Maximum Tensile Stress During Train Passage: {self._greatest_tensile_stress_information["sigma_t"]:.2f} MPa")
         print(f"Train Location Inducing Maximum Tensile Stress: Left-most wheel {self._greatest_tensile_stress_information["train_x"]:.2f} mm from the center of the left support")
         print(f"Beam Location Experiencing Maximum Tensile Stress: {self._greatest_tensile_stress_information["beam_x"]:.2f} mm from the center of the left support")
-        print(f"Factor of Safety Against Tensile Failure: {self._greatest_tensile_stress_information["FOS"]:.2f}")
+        print(f"{self._FOS_color(self.FOS["tensile"])}Factor of Safety Against Tensile Rupture Failure: {self.FOS["tensile"]:.2f}\033[0m")
         print()
         print("COMPRESSIVE STRESS ANALYSIS.")
         print(f"Maximum Compressive Stress During Train Passage: {self._greatest_compressive_stress_information["sigma_c"]:.2f} MPa")
         print(f"Train Location Inducing Maximum Compressive Stress: Left-most wheel {self._greatest_compressive_stress_information["train_x"]:.2f} mm from the center of the left support")
         print(f"Beam Location Experiencing Maximum Compressive Stress: {self._greatest_compressive_stress_information["beam_x"]:.2f} mm from the center of the left support")
-        print(f"Factor of Safety Against Compressive Failure: {self._greatest_compressive_stress_information["FOS"]:.2f}")
+        print(f"{self._FOS_color(self.FOS["compressive"])}Factor of Safety Against Compressive Crushing Failure: {self.FOS["compressive"]:.2f}\033[0m")
         print()
         print("SHEAR STRESS ANALYSIS.")
         print(f"Maximum Shear Stress During Train Passage: {self._greatest_shear_stress_information["tau_xy"]:.2f} MPa")
         print(f"Train Location Inducing Maximum Shear Stress: Left-most wheel {self._greatest_shear_stress_information["train_x"]:.2f} mm from the center of the left support")
         print(f"Beam Location Experiencing Maximum Shear Stress: {self._greatest_shear_stress_information["beam_x"]:.2f} mm from the center of the left support")
         print(f"Cross-sectional Beam Elevation Experiencing Maximum Shear Stress: {cross_section._shear_weakest_y:.2f} mm from the bottom")
-        print(f"Factor of Safety Against Shear Failure: {self._greatest_shear_stress_information["FOS"]:.2f}, assuming failure at 2 MPa")
+        print(f"{self._FOS_color(self.FOS["shear"])}Factor of Safety Against Shear Failure: {self.FOS["shear"]:.2f}, assuming failure at 2 MPa\033[0m")
         print()
+
+    def _package_FOS(self):
+        self.FOS = {
+            "tensile": self._greatest_tensile_stress_information["FOS"],
+            "compressive": self._greatest_compressive_stress_information["FOS"],
+            "shear": self._greatest_shear_stress_information["FOS"]
+        }
