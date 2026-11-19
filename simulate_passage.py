@@ -3,15 +3,15 @@ from constants_and_conventions import *
 
 """
 
-DOCUMENTATION OF THE AnalyzeFBD CLASS.
+DOCUMENTATION OF THE PassageSimultaion CLASS.
 
 ===== CONSTRUCTOR INPUTS =====
 
-train_loads = [P1, P2, P3, P4, P5, P6] are the six point-loads induced by the train wheels.
+train_loads = [P1, P2, P3, P4, P5, P6] are the six point-loads induced by the train wheels, in Newtons.
 
 ===== CLASS OUTPUTS =====
 
-self.passage_analysis is a dictionary, where self.passage_analysis[x] returns the AnalyzeFBD output
+self.passage_analysis is a dictionary, where self.passage_analysis[train_x] returns the AnalyzeFBD output
 (including the shear force/bending moment diagrams) for the inputted train load configuration
 when the left-most wheel of the train is x millimeters to the right of the center of the left support.
 

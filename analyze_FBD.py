@@ -20,7 +20,7 @@ self._point_loads = [
     ...
     {"beam_x": distance from left support, "P": point-load},
 ] 
-(In Newtons)
+(beam_x is in millimeters, P is in Newtons)
 (Including point-loads from train wheels)
 (NOT including reaction forces)
 (Only includes 0 mm <= beam_x <= 1200 mm)
@@ -35,7 +35,7 @@ self._FBD = [
     ...
     {"beam_x": distance from left support, "P": point-load},
 ] 
-(In Newtons)
+(beam_x is in millimeters, P is in Newtons)
 (Including point-loads from train wheels)
 (Including the two reaction forces)
 (Only includes 0 mm <= beam_x <= 1200 mm)
