@@ -26,14 +26,8 @@ Refer to documentation.py for instructions on utilizing this library.
 
 def main():
 
-    # Generating all load cases to be tested
-    loading_case_generator = GenerateLoadingCases()
-
-    # Picking a specific load case
-    loading_case = loading_case_generator.loading_cases[0]
-    
     # Simulating and analyzing a train passage
-    passage_simulation = PassageSimulation(loading_case)
+    passage_simulation = PassageSimulation(loading_case = [-67.5, -67.5, -67.5, -67.5, -91.0, -91.0])
 
 if __name__ == "__main__":
     main()

@@ -65,7 +65,7 @@ class PassageSimulation:
             self.passage_analysis[train_x] = AnalyzeFBD(self._loading_case, train_x)
 
             percentage = (train_x - (-TRAIN_LENGTH)) / (BRIDGE_LENGTH - (-TRAIN_LENGTH)) * 100
-            if train_x % 100 == 0: print(f"Finished analyzing train_x = {train_x} ({percentage:.2f}%)")
+            if train_x % 100 == 0: print(f"Analysis is {percentage:.2f}% complete.")
         whole_end = time.time()
         print(f"Finished analyzing the passage from train_x = {self._start_train_x} mm to train_x = {self._end_train_x} mm. Total computation time: {whole_end - whole_start:.2f} seconds.")
 
