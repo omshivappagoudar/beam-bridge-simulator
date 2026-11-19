@@ -109,7 +109,7 @@ class AnalyzeFBD:
         for wheel in range(6):
             point_load_location = self._train_location + TRAIN_POINT_LOAD_LOCATIONS[wheel]
             point_load_force = self._loading_case[wheel]
-            if point_load_location >= 0 and point_load_location <= BRIDGE_LENGTH:
+            if point_load_location >= 0.01 and point_load_location <= BRIDGE_LENGTH - 0.01:
                 self._point_loads.append({
                     "beam_x": point_load_location,
                     "P": point_load_force
@@ -135,9 +135,13 @@ class AnalyzeFBD:
 
     def _calculate_shear_force_diagram(self):
         self.shear_force_diagram = [0] * (BRIDGE_LENGTH + 1)
-        for force in self.FBD:
-            for beam_x in range(force["beam_x"], (BRIDGE_LENGTH + 1)):
-                self.shear_force_diagram[beam_x] += force["P"]
+        running_shear_force = 0
+        shear_force_index = 0
+        for beam_x in range(0, 1201):
+            if self.FBD[shear_force_index]["beam_x"] == beam_x:
+                running_shear_force += self.FBD[shear_force_index]["P"]
+                shear_force_index += 1
+            self.shear_force_diagram[beam_x] = running_shear_force
 
     def _calculate_bending_moment_diagram(self):
         self.bending_moment_diagram = [0]
@@ -165,10 +169,10 @@ class AnalyzeFBD:
         self._greatest_shear_stress_information = {"tau_xy": 0, "beam_x": 0}
         self._greatest_tensile_stress_information = {"sigma_t": 0, "beam_x": 0}
         self._greatest_compressive_stress_information = {"sigma_c": 0, "beam_x": 0}
+
         for beam_x in range(0, 1201):
             shear_force = self.get_shear_force(beam_x)
             bending_moment = self.get_bending_moment(beam_x)
-            shear_stress = self.get_maximum_shear_stress_at_beam_x(beam_x)["tau_xy"]
             tensile_stress = self.get_maximum_tensile_stress_at_beam_x(beam_x)
             compressive_stress = self.get_maximum_compressive_stress_at_beam_x(beam_x)
             if abs(shear_force) > abs(self._greatest_shear_force_information["V"]):
@@ -177,12 +181,13 @@ class AnalyzeFBD:
             if abs(bending_moment) > abs(self._greatest_bending_moment_information["M"]):
                 self._greatest_bending_moment_information["M"] = bending_moment
                 self._greatest_bending_moment_information["beam_x"] = beam_x
-            if abs(shear_stress) > abs(self._greatest_shear_stress_information["tau_xy"]):
-                self._greatest_shear_stress_information["tau_xy"] = shear_stress
-                self._greatest_shear_stress_information["beam_x"] = beam_x
             if abs(tensile_stress) > abs(self._greatest_tensile_stress_information["sigma_t"]):
                 self._greatest_tensile_stress_information["sigma_t"] = tensile_stress
                 self._greatest_tensile_stress_information["beam_x"] = beam_x
             if abs(compressive_stress) > abs(self._greatest_compressive_stress_information["sigma_c"]):
                 self._greatest_compressive_stress_information["sigma_c"] = compressive_stress
                 self._greatest_compressive_stress_information["beam_x"] = beam_x
+
+        max_shear_stress_beam_x = self._greatest_shear_force_information["beam_x"]
+        self._greatest_shear_stress_information["tau_xy"] = self.get_maximum_shear_stress_at_beam_x(max_shear_stress_beam_x)["tau_xy"]
+        self._greatest_shear_stress_information["beam_x"] = max_shear_stress_beam_x

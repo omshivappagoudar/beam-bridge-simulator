@@ -31,11 +31,8 @@ def main():
 
     # Picking a specific load case
     loading_case = loading_case_generator.loading_cases[0]
-
-    # Simulating a train passage between only a start and end location
-    # passage_simulation = PassageSimulation(loading_case, start_train_x = 165, end_train_x = 175)
     
-    # Simulating an entire train passage (This takes about 5 minutes to complete)
+    # Simulating and analyzing a train passage
     passage_simulation = PassageSimulation(loading_case)
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ class PassageSimulation:
         self.report_analysis()
 
     def report_analysis(self):
-        print("===== REPORT =====")
+        print("\n\n===== REPORT =====")
         print()
         self._print_loading_case()
         print()
@@ -62,13 +62,10 @@ class PassageSimulation:
         self.passage_analysis = {}
         whole_start = time.time()
         for train_x in range(self._start_train_x, self._end_train_x):
-
-            start = time.time()
             self.passage_analysis[train_x] = AnalyzeFBD(self._loading_case, train_x)
-            end = time.time()
 
             percentage = (train_x - (-TRAIN_LENGTH)) / (BRIDGE_LENGTH - (-TRAIN_LENGTH)) * 100
-            print(f"Finished analyzing train_x = {train_x} ({percentage:.2f}%); {end - start:.2f} seconds per frame")
+            if train_x % 100 == 0: print(f"Finished analyzing train_x = {train_x} ({percentage:.2f}%)")
         whole_end = time.time()
         print(f"Finished analyzing the passage from train_x = {self._start_train_x} mm to train_x = {self._end_train_x} mm. Total computation time: {whole_end - whole_start:.2f} seconds.")
 
