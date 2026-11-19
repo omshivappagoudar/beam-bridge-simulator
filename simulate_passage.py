@@ -40,7 +40,7 @@ class PassageSimulation:
         return self._greatest_bending_moment_information
 
     def get_greatest_shear_stress_information(self):
-        return self._greatest_bending_moment_information
+        return self._greatest_shear_stress_information
 
     def get_greatest_tensile_stress_information(self):
         return self._greatest_tensile_stress_information
