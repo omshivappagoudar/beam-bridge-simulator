@@ -17,5 +17,11 @@ class GenerateLoadingCases:
 
         # Load Case 2 (Progressive)
         base_P = 135.0 / 2
-        for P in range(int(base_P), int(5 * base_P), int(0.1 * base_P)):
+        for P in range(int(base_P), int(50 * base_P), int(0.1 * base_P)):
             self.loading_cases.append([P * 1.10, P * 1.10, P, P, P * 1.35, P * 1.35])
+
+    def calculate_total_load(self, loading_case):
+        total = 0
+        for load in loading_case:
+            total += load
+        return total

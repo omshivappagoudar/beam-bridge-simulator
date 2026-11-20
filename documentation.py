@@ -1,7 +1,6 @@
-from constants_and_conventions import *
-from beam_properties import CrossSectionAnalysis
+from constants import *
+from cross_section_analysis import CrossSectionAnalysis
 from loading_cases import GenerateLoadingCases
-from testing import *
 from simulate_passage import PassageSimulation
 
 # Generating all load cases to be tested
@@ -76,8 +75,3 @@ print("14. Greatest Tensile Stress sigma_t During Train Passage:", passage_simul
 
 # Getting the greatest compressive stress, in magnitude, throughout the entire train passage
 print("15. Greatest Compressive Stress sigma_c During Train Passage:", passage_simulation.get_greatest_compressive_stress_information())
-
-# Testing the code using test cases in testing.py
-print("\n===== TESTING =====")
-run_full_test_suite()
-print()

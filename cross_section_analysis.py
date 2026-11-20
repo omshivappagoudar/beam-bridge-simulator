@@ -1,3 +1,6 @@
+from constants import *
+import numpy as np
+
 """
 
 DOCUMENTATION OF THE CrossSectionAnalysis CLASS.
@@ -23,6 +26,8 @@ class CrossSectionAnalysis:
         self.moment_of_inertia = self._calculate_moment_of_inertia()
         self._calculate_cross_section_height()
         self._calculate_weakest_y_with_respect_to_shear_stress()
+        self._calculate_bridge_volume()
+        self._calculate_bridge_weight()
 
     def get_area(self):
         return self.area
@@ -32,6 +37,12 @@ class CrossSectionAnalysis:
 
     def get_moment_of_inertia(self):
         return self.moment_of_inertia
+
+    def get_volume(self):
+        return self.volume
+
+    def get_weight(self):
+        return self.weight
 
     def calculate_shear_stress(self, V, y): # tau_xy = VQ/Ib, in MPa
         return V * self._calculate_Q(y) / (self.moment_of_inertia * self._calculate_total_intersection(y))
@@ -71,6 +82,12 @@ class CrossSectionAnalysis:
             I_local = b * (h ** 3) / 12
             I += I_local + area * ((y - self.centroid) ** 2)
         return I
+
+    def _calculate_bridge_volume(self):
+        self.volume = self.area * BRIDGE_LENGTH
+
+    def _calculate_bridge_weight(self):
+        self.weight = self.volume * MATBOARD_WEIGHT_DENSITY
     
     def _calculate_total_intersection(self, y): # in mm; the total length of the intersection of the beam with the horizontal line at height y
         total_intersection = 0
@@ -82,10 +99,10 @@ class CrossSectionAnalysis:
                 total_intersection += piece["b"]
         return total_intersection
 
-    def _calculate_Q(self, y):
+    def _calculate_Q(self, y, dy = 0.1):
         Q = 0
-        for y_current in range(0, y):
-            Q += (y_current - self.get_centroid()) * self._calculate_total_intersection(y_current)
+        for y_current in np.arange(0, y, dy):
+            Q += (y_current - self.get_centroid()) * self._calculate_total_intersection(y_current) * dy
         return Q
 
     def _calculate_cross_section_height(self):
@@ -93,11 +110,13 @@ class CrossSectionAnalysis:
         for piece in self._pieces:
             self._max_height = max(self._max_height, piece["y"] + piece["h"] / 2)
 
-    def _calculate_weakest_y_with_respect_to_shear_stress(self):
+    def _calculate_weakest_y_with_respect_to_shear_stress(self, dy = 0.1):
         self._shear_weakest_y = 0
         weakest_Qb = 0
-        for y in range(0, int(self._max_height + 1)):
-            Qb_ratio = self._calculate_Q(y) / self._calculate_total_intersection(y)
-            if abs(Qb_ratio) > weakest_Qb:
+        for y in np.arange(0, int(self._max_height + 1), dy):
+            intersection = self._calculate_total_intersection(y)
+            if intersection < 1e-6: continue
+            Qb_ratio = self._calculate_Q(y) / intersection
+            if abs(Qb_ratio) > abs(weakest_Qb):
                 self._shear_weakest_y = y
                 weakest_Qb = Qb_ratio

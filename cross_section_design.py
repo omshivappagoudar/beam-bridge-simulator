@@ -1,4 +1,4 @@
-from beam_properties import CrossSectionAnalysis
+from cross_section_analysis import CrossSectionAnalysis
 
 # ===== POTENTIAL DESIGNS =====
 
