@@ -1,14 +1,12 @@
 # ===== MATERIAL PROPERTIES =====
 
-BRIDGE_LENGTH = 1260                        # mm
-SUPPORT_SPAN = 1200                         # mm
-MATBOARD_WEIGHT_DENSITY = 8e-7 * 9.81       # kg/mm^3 * m/s^2 = N/mm^3
+BRIDGE_LENGTH = 1200                         # mm
 
-MATBOARD_YOUNGS_MODULUS = 4000              # MPa
-MATBOARD_TENSILE_FAILURE_STRESS = 30        # MPa
-MATBOARD_COMPRESSIVE_FAILURE_STRESS = 6     # MPa
-MATBOARD_SHEAR_FAILURE_STRESS = 4           # MPa
-CONTACT_CEMENT_SHEAR_FAILURE_STRESS = 2     # MPa (If properly cured)
+MATBOARD_YOUNGS_MODULUS = 4000 * 10              # MPa
+MATBOARD_TENSILE_FAILURE_STRESS = 30 * 10        # MPa
+MATBOARD_COMPRESSIVE_FAILURE_STRESS = 6 * 10     # MPa
+MATBOARD_SHEAR_FAILURE_STRESS = 4 * 10           # MPa
+CONTACT_CEMENT_SHEAR_FAILURE_STRESS = 2 * 10     # MPa (If properly cured)
 
 # ===== TRAIN GEOMETRY =====
 

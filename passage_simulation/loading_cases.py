@@ -1,0 +1,24 @@
+from constants import *
+
+class GenerateLoadingCases:
+    def __init__(self):
+        self.loading_cases = []
+        self.generate_base_loading_cases()
+
+    def generate_failure_loading_case(self, passage_simulation):
+        P = 135.0 / 2 * passage_simulation.minimum_FOS * (1 + 1e-6)
+        return [P * 1.10, P * 1.10, P, P, P * 1.35, P * 1.35]
+
+    def generate_base_loading_cases(self):
+
+        # Loading Case 1
+        P = 400.0 / 6
+        self.loading_cases.append([P, P, P, P, P, P])
+
+        # Load Case 2 (Base Case)
+        P = 135.0 / 2
+        self.loading_cases.append([P, P, P, P, P * 1.35, P * 1.35])
+
+        # Load Case 2 (Progressive Base Case)
+        P = 135.0 / 2
+        self.loading_cases.append([P * 1.10, P * 1.10, P, P, P * 1.35, P * 1.35])
