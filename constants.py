@@ -7,6 +7,12 @@ MATBOARD_TENSILE_FAILURE_STRESS = 30        # MPa
 MATBOARD_COMPRESSIVE_FAILURE_STRESS = 6     # MPa
 MATBOARD_SHEAR_FAILURE_STRESS = 4           # MPa
 CONTACT_CEMENT_SHEAR_FAILURE_STRESS = 2     # MPa (If properly cured)
+MATBOARD_POISSON_RATIO = 0.20               # Unitless
+
+PLATE_BUCKLING_COEFFICIENTS = {             # Unitless
+    "both_edges_supported": 4.0,
+    "one_edge_free": 0.425,
+}
 
 # ===== TRAIN GEOMETRY =====
 

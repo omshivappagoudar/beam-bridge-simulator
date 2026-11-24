@@ -1,101 +1,130 @@
+from math import isfinite
+
+
 class JudgeResults:
+    MODES = [
+        ("Tensile rupture", "tensile_rupture"),
+        ("Compressive crushing", "compressive_crushing"),
+        ("Matboard shear", "matboard_shear_failure"),
+        ("Glue shear", "glue_shear_failure"),
+        ("Flange plate buckling", "plate_buckling"),
+    ]
+
     def __init__(self, passage_simulation):
         self.passage_simulation = passage_simulation
         self.judge_results()
 
     def judge_results(self):
-        self.judge_tensile_rupture_FOS()
-        self.judge_compressive_crushing_FOS()
-        self.judge_matboard_shear_failure_FOS()
-        self.judge_glue_shear_failure_FOS()
-        self.determine_minimum_FOS()
-        self.determine_failure()
+        simulation = self.passage_simulation
+
+        simulation.tensile_rupture_failure = (
+            simulation.tensile_rupture_FOS_information["FOS"] < 1
+        )
+        simulation.compressive_crushing_failure = (
+            simulation.compressive_crushing_FOS_information["FOS"] < 1
+        )
+        simulation.matboard_shear_failure = (
+            simulation.matboard_shear_failure_FOS_information["FOS"] < 1
+        )
+        simulation.glue_shear_failure = (
+            simulation.glue_shear_failure_FOS_information["FOS"] < 1
+        )
+        simulation.plate_buckling_failure = (
+            simulation.plate_buckling_FOS_information["FOS"] < 1
+        )
+
+        simulation.minimum_FOS = min(
+            getattr(simulation, f"{attribute}_FOS_information")["FOS"]
+            for _, attribute in self.MODES
+        )
+
+        simulation.bridge_failure = simulation.minimum_FOS < 1
         self.print_results()
 
-    def judge_tensile_rupture_FOS(self):
-        FOS = self.passage_simulation.tensile_rupture_FOS_information["FOS"]
-        self.passage_simulation.tensile_rupture_failure = (FOS < 1)
-
-    def judge_compressive_crushing_FOS(self):
-        FOS = self.passage_simulation.compressive_crushing_FOS_information["FOS"]
-        self.passage_simulation.compressive_crushing_failure = (FOS < 1)
-
-    def judge_matboard_shear_failure_FOS(self):
-        FOS = self.passage_simulation.matboard_shear_failure_FOS_information["FOS"]
-        self.passage_simulation.matboard_shear_failure = (FOS < 1)
-
-    def judge_glue_shear_failure_FOS(self):
-        FOS = self.passage_simulation.glue_shear_failure_FOS_information["FOS"]
-        self.passage_simulation.glue_shear_failure = (FOS < 1)
-
-    def determine_minimum_FOS(self):
-        self.passage_simulation.minimum_FOS = min([
-            self.passage_simulation.tensile_rupture_FOS_information["FOS"],
-            self.passage_simulation.compressive_crushing_FOS_information["FOS"],
-            self.passage_simulation.matboard_shear_failure_FOS_information["FOS"],
-            self.passage_simulation.glue_shear_failure_FOS_information["FOS"]
-        ])
-
-    def determine_failure(self):
-        self.passage_simulation.bridge_failure = (self.passage_simulation.minimum_FOS < 1)
-    
     def FOS_color(self, FOS):
         if FOS < 1:
-            return "\033[1;31m"
-        else:
-            return "\033[1;32m"
-    
+            return "\033[1;31m"  # Bold red
+        return "\033[1;32m"      # Bold green
+
     def print_results(self):
-        print(f"\n\n===== REPORT: TRIAL {self.passage_simulation.trial_id} =====\n")
+        simulation = self.passage_simulation
 
-        print("LOADING CASE TESTED.")
-        print(f"Left Cart Weight: {self.passage_simulation.loading_case[0] + self.passage_simulation.loading_case[1]:.2f} N")
-        print(f"Center Cart Weight: {self.passage_simulation.loading_case[2] + self.passage_simulation.loading_case[3]:.2f} N")
-        print(f"Right Cart Weight: {self.passage_simulation.loading_case[4] + self.passage_simulation.loading_case[5]:.2f} N")
-        print()
+        print(f"\n===== REPORT: TRIAL {simulation.trial_id} =====")
+        print(
+            "Axle loads:",
+            ", ".join(f"{load:.2f} N" for load in simulation.loading_case),
+        )
+        print(f"Total train load: {sum(simulation.loading_case):.2f} N")
 
-        FOS_info = self.passage_simulation.tensile_rupture_FOS_information
-        color = self.FOS_color(FOS_info["FOS"])
-        print("I. Analysis of Tensile Rupture")
-        print(f"{color}Factor of Safety: {FOS_info["FOS"]:.2f}\033[0m")
-        print(f"{color}Beam Location with Lowest Factor of Safety: {FOS_info["beam_x"]:.2f} mm\033[0m")
-        print()
+        for title, attribute in self.MODES:
+            information = getattr(
+                simulation, f"{attribute}_FOS_information"
+            )
+            FOS = information["FOS"]
 
-        FOS_info = self.passage_simulation.compressive_crushing_FOS_information
-        color = self.FOS_color(FOS_info["FOS"])
-        print("II. Analysis of Compressive Crushing")
-        print(f"{color}Factor of Safety: {FOS_info["FOS"]:.2f}\033[0m")
-        print(f"{color}Beam Location with Lowest Factor of Safety: {FOS_info["beam_x"]:.2f} mm\033[0m")
-        print()
+            print(f"\n{title}")
 
-        FOS_info = self.passage_simulation.matboard_shear_failure_FOS_information
-        color = self.FOS_color(FOS_info["FOS"])
-        print("III. Analysis of Matboard Shear Failure")
-        print(f"{color}Factor of Safety: {FOS_info["FOS"]:.2f}\033[0m")
-        print(f"{color}Beam Location with Lowest Factor of Safety: {FOS_info["beam_x"]:.2f} mm\033[0m")
-        print()
+            reset = "\033[0m"
 
-        FOS_info = self.passage_simulation.glue_shear_failure_FOS_information
-        color = self.FOS_color(FOS_info["FOS"])
-        print("IV. Analysis of Glue Shear Failure")
-        print(f"{color}Factor of Safety: {FOS_info["FOS"]:.2f}\033[0m")
-        print(f"{color}Beam Location with Lowest Factor of Safety: {FOS_info["beam_x"]:.2f} mm\033[0m")
-        print()
+            if isfinite(FOS):
+                color = self.FOS_color(FOS)
 
-        if self.passage_simulation.bridge_failure:
-            print("\033[1;31mVERDICT: BRIDGE FAILURE\033[0m")
-            print("\n===== FINAL RESULT =====")
-            print(f"Failure Loading: [{self.passage_simulation.loading_case[0]:.2f} N, {self.passage_simulation.loading_case[1]:.2f} N, {self.passage_simulation.loading_case[2]:.2f} N, {self.passage_simulation.loading_case[3]:.2f} N, {self.passage_simulation.loading_case[4]:.2f} N, {self.passage_simulation.loading_case[5]:.2f} N]")
-            failure_load = 0
-            for point_load in self.passage_simulation.loading_case:
-                failure_load += point_load
-            print(f"Total Load: {failure_load:.2f} N")
+                print(f"{color}Factor of safety: {FOS:.3f}{reset}")
+                print(
+                    f"{color}Critical bridge position: "
+                    f"{information['beam_x']} mm{reset}"
+                )
+            else:
+                print(
+                    "\033[1;33m"
+                    "No finite FOS for this loading/check."
+                    "\033[0m"
+                )
+                print("See coverage notes below.")
+
+        print("\nBUCKLING COVERAGE")
+        print("Implemented: the two assigned flange compression cases.")
+        print("Web compression buckling and shear buckling: NOT IMPLEMENTED.")
+
+        for section in simulation.beam_bridge.cross_sections:
+            unchecked = section.plate_buckling_unchecked
+            if unchecked:
+                print(
+                    f"Section {section.cross_section_id}, "
+                    f"unassigned pieces: {', '.join(unchecked)}"
+                )
+
+            for result in section.plate_buckling_results:
+                if result["status"] == "not in compression":
+                    print(
+                        f"Section {section.cross_section_id}, "
+                        f"{result['name']}: not compressed under "
+                        "positive bending."
+                    )
+        
+        reset = "\033[0m"
+        color = self.FOS_color(simulation.minimum_FOS)
+
+        print(
+            f"\n{color}Minimum FOS of evaluated modes: "
+            f"{simulation.minimum_FOS:.3f}{reset}"
+        )
+
+        if simulation.bridge_failure:
+            print(
+                f"{color}"
+                "VERDICT: FAILURE PREDICTED IN AN EVALUATED MODE"
+                f"{reset}"
+            )
         else:
-            print("\033[1;32mVERDICT: NO BRIDGE FAILURE\033[0m")
-            print("\n===== FINAL RESULT =====")
-            print(f"Successful Loading: [{self.passage_simulation.loading_case[0]:.2f} N, {self.passage_simulation.loading_case[1]:.2f} N, {self.passage_simulation.loading_case[2]:.2f} N, {self.passage_simulation.loading_case[3]:.2f} N, {self.passage_simulation.loading_case[4]:.2f} N, {self.passage_simulation.loading_case[5]:.2f} N]")
-            successful_load = 0
-            for point_load in self.passage_simulation.loading_case:
-                successful_load += point_load
-            print(f"Total Load: {successful_load:.2f} N")
-        print()
+            print(
+                f"{color}"
+                "VERDICT: NO FAILURE PREDICTED IN EVALUATED MODES"
+                f"{reset}"
+            )
+
+        print(
+            "\033[1;33m"
+            "This is not a complete assessment of all buckling modes."
+            "\033[0m"
+        )

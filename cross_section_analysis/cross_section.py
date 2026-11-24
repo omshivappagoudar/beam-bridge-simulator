@@ -6,6 +6,7 @@ from cross_section_analysis.deduce_constraints.analyze_glue_shear import *
 from cross_section_analysis.deduce_constraints.analyze_tensile_stress import *
 from cross_section_analysis.deduce_constraints.analyze_compressive_stress import *
 from cross_section_analysis.aggregate_constraints import *
+from cross_section_analysis.deduce_constraints.analyze_plate_buckling import *
 
 class CrossSection:
 
@@ -23,6 +24,7 @@ class CrossSection:
         AnalyzeGlueShear(self)
         AnalyzeTensileStress(self)
         AnalyzeCompressiveStress(self)
+        AnalyzePlateBuckling(self)
 
         AggregateConstraints(self)
 

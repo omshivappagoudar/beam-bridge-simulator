@@ -15,6 +15,7 @@ class CalculateFactorOfSafetyDiagrams:
         self.calculate_compressive_crushing_FOS_diagram()
         self.calculate_matboard_shear_failure_FOS_diagram()
         self.calculate_glue_shear_failure_FOS_diagram()
+        self.calculate_plate_buckling_FOS_diagram()
 
     def calculate_tensile_rupture_FOS_diagram(self):
         for beam_x in range(0, BRIDGE_LENGTH + 1):
@@ -39,3 +40,27 @@ class CalculateFactorOfSafetyDiagrams:
             constraint = self.passage_simulation.beam_bridge.get_relevant_constraints(beam_x)[CONSTRAINT_AGAINST_GLUE_SHEAR_FAILURE]
             max_V = constraint.maximum_value
             self.passage_simulation.glue_shear_failure_FOS_diagram[beam_x] = max_V / (self.passage_simulation.maximum_shear_force_diagram[beam_x] + 1e-6)
+
+    def calculate_plate_buckling_FOS_diagram(self):
+        simulation = self.passage_simulation
+        simulation.plate_buckling_FOS_diagram = []
+
+        for beam_x in range(BRIDGE_LENGTH + 1):
+            constraints = (
+                simulation.beam_bridge.get_relevant_constraints(beam_x)
+            )
+
+            capacity = constraints[
+                CONSTRAINT_AGAINST_PLATE_BUCKLING
+            ].maximum_value
+
+            demand = abs(
+                simulation.maximum_bending_moment_diagram[beam_x]
+            )
+
+            if demand == 0:
+                FOS = float("inf")
+            else:
+                FOS = capacity / demand
+
+            simulation.plate_buckling_FOS_diagram.append(FOS)
