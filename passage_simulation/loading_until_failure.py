@@ -1,6 +1,14 @@
 from passage_simulation.loading_cases import GenerateLoadingCases
 from passage_simulation.simulate_passage import PassageSimulation
 
+import math
+
+def norm(L):
+    s = 0
+    for i in L:
+        s += i ** 2
+    return math.sqrt(s)
+
 class LoadUntilFailure:
     def __init__(self, beam_bridge):
         self.beam_bridge = beam_bridge
@@ -17,7 +25,7 @@ class LoadUntilFailure:
             trial_id = 1
         )
         if passage_simulation.bridge_failure:
-            return
+            return passage_simulation
 
         # Loading Case 2 (Base Case)
         current_loading_case = load_case_generator.loading_cases[1]
@@ -27,7 +35,7 @@ class LoadUntilFailure:
             trial_id = 2
         )
         if passage_simulation.bridge_failure:
-            return
+            return passage_simulation
 
         # Loading Case 2 (Progressive Base Case)
         current_loading_case = load_case_generator.loading_cases[2]
@@ -37,7 +45,7 @@ class LoadUntilFailure:
             trial_id = 3
         )
         if passage_simulation.bridge_failure:
-            return
+            return passage_simulation
 
         # Failure Loading Case
         current_loading_case = load_case_generator.generate_failure_loading_case(passage_simulation)
@@ -47,4 +55,4 @@ class LoadUntilFailure:
             trial_id = 4
         )
         if passage_simulation.bridge_failure:
-            return
+            return passage_simulation

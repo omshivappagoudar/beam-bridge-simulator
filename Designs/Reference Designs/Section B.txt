@@ -1,0 +1,117 @@
+from cross_section_analysis.cross_section import *
+from cross_section_analysis.beam_bridge import *
+from cross_section_analysis.utilities import *
+
+number_of_top_layers = 2
+height_excluding_top_layers = 102.54 - 1.27 * number_of_top_layers
+
+pieces_1 = []
+for i in range(number_of_top_layers):
+    pieces_1.append({"b": 120, "h": 1.27, "y": 102.54 - 1.27 * (i + 0.5)})
+pieces_1.append({"b": 10, "h": 1.27, "y": 102.54 - 1.27 * (number_of_top_layers + 0.5)})
+pieces_1.append({"b": 10, "h": 1.27, "y": 102.54 - 1.27 * (number_of_top_layers + 0.5)})
+pieces_1.append({"b": 1.27, "h": height_excluding_top_layers - 2 * 1.27, "y": height_excluding_top_layers / 2})
+pieces_1.append({"b": 1.27, "h": height_excluding_top_layers - 2 * 1.27, "y": height_excluding_top_layers / 2})
+
+height = calculate_total_height(pieces_1)
+centroid = calculate_centroid(pieces_1)
+
+glue_list_1 = []
+glue_list_1.append({
+    "y": 102.54 - 1.27 - 1e-6,
+    "b": 120
+})
+glue_list_1.append({
+    "y": 102.54 - 1.27 * 2 - 1e-6,
+    "b": 10
+})
+
+buckling_region_1 = {
+    "buckling_case": 1,
+    "t": number_of_top_layers * 1.27,
+    "b": 80
+}
+buckling_region_2 = {
+    "buckling_case": 2,
+    "t": number_of_top_layers * 1.27,
+    "b": (pieces_1[0]["b"] - 80) / 2
+}
+buckling_region_3 = {
+    "buckling_case": 3,
+    "t": 1.27,
+    "b": height - centroid - number_of_top_layers * 1.27
+}
+buckling_region_4 = {
+    "buckling_case": 4,
+    "t": 1.27,
+    "h": pieces_1[-2]["h"],
+    "a": 1200
+}
+
+buckling_regions_1 = [buckling_region_1, buckling_region_2, buckling_region_3, buckling_region_4]
+
+cross_section_1 = CrossSection(
+    pieces = pieces_1,
+    glue_list = glue_list_1,
+    buckling_regions = buckling_regions_1,
+    start_beam_x = 0,
+    end_beam_x = 1200,
+    cross_section_id = 1
+)
+
+
+cross_sections = [cross_section_1]
+
+beam_bridge = BeamBridge(cross_sections)
+
+"""
+
+MATERIAL USAGE.
+Matboard Area Used: 545904.00 mm^2 out of 826008.00 mm^2 (66.09%)
+Total Bridge Weight: 5.10 N
+
+LOADING CASE TESTED.
+Left Cart Weight: 262.38 N
+Center Cart Weight: 238.53 N
+Right Cart Weight: 322.02 N
+
+I. Analysis of Tensile Rupture
+Factor of Safety: 1.53
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+II. Analysis of Compressive Crushing
+Factor of Safety: 1.04
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+III. Analysis of Matboard Shear Failure
+Factor of Safety: 1.37
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+IV. Analysis of Glue Shear Failure
+Factor of Safety: 6.17
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+V. Analysis of Case 1 Local Buckling
+Factor of Safety: 2.39
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VI. Analysis of Case 2 Local Buckling
+Factor of Safety: 4.06
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VII. Analysis of Case 3 Local Buckling
+Factor of Safety: 14.90
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VIII. Analysis of Case 4 Local Buckling
+Factor of Safety: 1.00
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+VERDICT: BRIDGE FAILURE
+
+===== FINAL RESULT =====
+Failure Loading: [131.19 N, 131.19 N, 119.27 N, 119.27 N, 161.01 N, 161.01 N]
+Total Load: 822.93 N
+Strength to Weight Ratio: 161.33
+
+"""

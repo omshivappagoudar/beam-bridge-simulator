@@ -5,20 +5,14 @@
 2. Compressive Crushing FOS Computation (1 Failure Mode)
 3. Matboard Shear Failure FOS Computation (1 Failure Mode)
 4. Glue Shear Failure FOS Computation (1 Failure Mode)
-
-===== TO-DO LIST =====
-1. Implement Local Buckling FOS Computation (4 Failure Modes)
-2. Implement Euler Buckling Checking (1 Failure Mode)
-3. Implement Allowed vs Actual Shear Force and Bending Moment Diagram Graphing
+5. Local Buckling FOS Computation (4 Failure Modes)
 
 """
 
 from bridge_design import *
 from passage_simulation.loading_until_failure import *
 
-"""
-Refer to documentation.py for instructions on utilizing this library.
-"""
+import math
 
 def main():
     LoadUntilFailure(beam_bridge)

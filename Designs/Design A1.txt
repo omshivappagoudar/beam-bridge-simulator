@@ -1,0 +1,126 @@
+from cross_section_analysis.cross_section import *
+from cross_section_analysis.beam_bridge import *
+from cross_section_analysis.utilities import *
+
+number_of_top_layers = 4
+height_excluding_top_layers = 76.27 - 1.27 * number_of_top_layers
+
+pieces_1 = []
+for i in range(number_of_top_layers):
+    pieces_1.append({"b": 100, "h": 1.27, "y": 76.27 - 1.27 * (i + 0.5)})
+pieces_1.append({"b": 6.27, "h": 1.27, "y": 76.27 - 1.27 * (number_of_top_layers + 0.5)})
+pieces_1.append({"b": 6.27, "h": 1.27, "y": 76.27 - 1.27 * (number_of_top_layers + 0.5)})
+pieces_1.append({"b": 1.27, "h": height_excluding_top_layers - 2 * 1.27, "y": height_excluding_top_layers / 2})
+pieces_1.append({"b": 1.27, "h": height_excluding_top_layers - 2 * 1.27, "y": height_excluding_top_layers / 2})
+pieces_1.append({"b": 75, "h": 1.27 / 2, "y": 1.27 / 2})
+
+height = calculate_total_height(pieces_1)
+centroid = calculate_centroid(pieces_1)
+
+glue_list_1 = []
+for i in range(1, number_of_top_layers):    
+    glue_list_1.append({
+        "y": 76.27 - 1.27 * i,
+        "b": 100
+    })
+glue_list_1.append({
+    "y": 76.27 - 1.27 * number_of_top_layers,
+    "b": 6.27 * 2
+})
+glue_list_1.append({
+    "y": 1.27,
+    "b": 2 * 1.27
+})
+
+buckling_region_1 = {
+    "buckling_case": 1,
+    "t": 1.27 * number_of_top_layers,
+    "b": 80
+}
+buckling_region_2 = {
+    "buckling_case": 2,
+    "t": 1.27 * number_of_top_layers,
+    "b": (100 - 80) / 2
+}
+buckling_region_3 = {
+    "buckling_case": 3,
+    "t": 1.27,
+    "b": height - centroid - 1.27 * number_of_top_layers
+}
+buckling_region_4 = {
+    "buckling_case": 4,
+    "t": 1.27,
+    "h": 76.27 - 1.27 * number_of_top_layers - 2 * 1.27,
+    "a": 1200
+}
+
+buckling_regions_1 = [buckling_region_1, buckling_region_2, buckling_region_3, buckling_region_4]
+
+cross_section_1 = CrossSection(
+    pieces = pieces_1,
+    glue_list = glue_list_1,
+    buckling_regions = buckling_regions_1,
+    start_beam_x = 0,
+    end_beam_x = 1200,
+    cross_section_id = 1
+)
+
+
+cross_sections = [cross_section_1]
+
+beam_bridge = BeamBridge(cross_sections)
+
+
+"""
+
+===== REPORT: TRIAL 4 =====
+
+MATERIAL USAGE.
+Matboard Area Used: 704808.00 mm^2 out of 826008.00 mm^2 (85.33%)
+Total Bridge Weight: 6.59 N
+
+LOADING CASE TESTED.
+Left Cart Weight: 296.79 N
+Center Cart Weight: 269.81 N
+Right Cart Weight: 364.24 N
+
+I. Analysis of Tensile Rupture
+Factor of Safety: 1.38
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+II. Analysis of Compressive Crushing
+Factor of Safety: 1.02
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+III. Analysis of Matboard Shear Failure
+Factor of Safety: 1.00
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+IV. Analysis of Glue Shear Failure
+Factor of Safety: 1.28
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+V. Analysis of Case 1 Local Buckling
+Factor of Safety: 9.44
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VI. Analysis of Case 2 Local Buckling
+Factor of Safety: 64.17
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VII. Analysis of Case 3 Local Buckling
+Factor of Safety: 66.86
+Beam Location with Lowest Factor of Safety: 632.00 mm
+
+VIII. Analysis of Case 4 Local Buckling
+Factor of Safety: 1.47
+Beam Location with Lowest Factor of Safety: 1199.00 mm
+
+VERDICT: BRIDGE FAILURE
+
+===== FINAL RESULT =====
+Failure Loading: [148.40 N, 148.40 N, 134.91 N, 134.91 N, 182.12 N, 182.12 N]
+Total Load: 930.85 N
+Strength to Weight Ratio: 141.34
+
+"""

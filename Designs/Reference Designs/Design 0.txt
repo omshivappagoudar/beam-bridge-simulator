@@ -1,0 +1,118 @@
+from cross_section_analysis.cross_section import *
+from cross_section_analysis.beam_bridge import *
+from cross_section_analysis.utilities import *
+
+cross_section_0_pieces = [
+    {"b": 100, "h": 1.27, "y": 75 + 1.27 / 2}, # Piece 1
+    {"b": 6.27, "h": 1.27, "y": 75 - 1.27 / 2}, # Piece 2
+    {"b": 6.27, "h": 1.27, "y": 75 - 1.27 / 2}, # Piece 3
+    {"b": 1.27, "h": 75 - 2 * 1.27, "y": 75 / 2}, # Piece 4
+    {"b": 1.27, "h": 75 - 2 * 1.27, "y": 75 / 2}, # Piece 5
+    {"b": 80, "h": 1.27, "y": 1.27 / 2}, # Piece 6
+]
+
+height = calculate_total_height(cross_section_0_pieces)
+centroid = calculate_centroid(cross_section_0_pieces)
+
+glue_list_1 = []
+glue_list_1.append({
+    "y": 75,
+    "b": 6.27
+})
+glue_list_1.append({
+    "y": 1.27,
+    "b": 2 * 1.27
+})
+
+buckling_region_1 = {
+    "buckling_case": 1,
+    "t": 1.27,
+    "b": 80
+}
+buckling_region_2 = {
+    "buckling_case": 2,
+    "t": 1.27,
+    "b": (100 - 80) / 2
+}
+buckling_region_3 = {
+    "buckling_case": 3,
+    "t": 1.27,
+    "b": height - centroid - 1.27
+}
+buckling_region_4 = {
+    "buckling_case": 4,
+    "t": 1.27,
+    "h": 75 - 2 * 1.27,
+    "a": 1200
+}
+
+buckling_regions_1 = [buckling_region_1, buckling_region_2, buckling_region_3, buckling_region_4]
+
+cross_section_1 = CrossSection(
+    pieces = cross_section_0_pieces,
+    glue_list = glue_list_1,
+    buckling_regions = buckling_regions_1,
+    start_beam_x = 0,
+    end_beam_x = 1200,
+    cross_section_id = 1
+)
+
+
+cross_sections = [cross_section_1]
+
+beam_bridge = BeamBridge(cross_sections)
+
+
+"""
+
+===== REPORT: TRIAL 1 =====
+
+MATERIAL USAGE.
+Matboard Area Used: 404952.00 mm^2 out of 826008.00 mm^2 (49.03%)
+Total Bridge Weight: 3.78 N
+
+LOADING CASE TESTED.
+Left Cart Weight: 133.33 N
+Center Cart Weight: 133.33 N
+Right Cart Weight: 133.33 N
+
+I. Analysis of Tensile Rupture
+Factor of Safety: 4.36
+Beam Location with Lowest Factor of Safety: 644.00 mm
+
+II. Analysis of Compressive Crushing
+Factor of Safety: 1.04
+Beam Location with Lowest Factor of Safety: 644.00 mm
+
+III. Analysis of Matboard Shear Failure
+Factor of Safety: 2.67
+Beam Location with Lowest Factor of Safety: 0.00 mm
+
+IV. Analysis of Glue Shear Failure
+Factor of Safety: 2.00
+Beam Location with Lowest Factor of Safety: 0.00 mm
+
+V. Analysis of Case 1 Local Buckling
+Factor of Safety: 0.60
+Beam Location with Lowest Factor of Safety: 644.00 mm
+
+VI. Analysis of Case 2 Local Buckling
+Factor of Safety: 4.06
+Beam Location with Lowest Factor of Safety: 644.00 mm
+
+VII. Analysis of Case 3 Local Buckling
+Factor of Safety: 5.28
+Beam Location with Lowest Factor of Safety: 644.00 mm
+
+VIII. Analysis of Case 4 Local Buckling
+Factor of Safety: 3.53
+Beam Location with Lowest Factor of Safety: 0.00 mm
+
+VERDICT: BRIDGE FAILURE
+
+===== FINAL RESULT =====
+Failure Loading: [66.67 N, 66.67 N, 66.67 N, 66.67 N, 66.67 N, 66.67 N]
+Total Load: 400.00 N
+Strength to Weight Ratio: 105.71
+
+"""

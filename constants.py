@@ -1,8 +1,12 @@
 # ===== MATERIAL PROPERTIES =====
 
-BRIDGE_LENGTH = 1200                         # mm
+BRIDGE_LENGTH = 1260                        # mm
+SUPPORT_SPAN = 1200                         # mm
+MATBOARD_DENSITY = 7.5e-7 * 9.81            # N/mm^3
 
 MATBOARD_YOUNGS_MODULUS = 4000              # MPa
+POISSONS_RATIO = 0.2
+
 MATBOARD_TENSILE_FAILURE_STRESS = 30        # MPa
 MATBOARD_COMPRESSIVE_FAILURE_STRESS = 6     # MPa
 MATBOARD_SHEAR_FAILURE_STRESS = 4           # MPa

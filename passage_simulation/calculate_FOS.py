@@ -10,11 +10,15 @@ class CalculateFactorsOfSafety:
         self.calculate_compressive_crushing_FOS_information()
         self.calculate_matboard_shear_failure_FOS_information()
         self.calculate_glue_shear_failure_FOS_information()
+        self.calculate_local_buckling_case_1_FOS_information()
+        self.calculate_local_buckling_case_2_FOS_information()
+        self.calculate_local_buckling_case_3_FOS_information()
+        self.calculate_local_buckling_case_4_FOS_information()
 
     def calculate_tensile_rupture_FOS_information(self):
         minimum_FOS = 1e9
         minimum_FOS_beam_x = 0
-        for beam_x in range(0, BRIDGE_LENGTH + 1):
+        for beam_x in range(0, SUPPORT_SPAN + 1):
             FOS = self.passage_simulation.tensile_rupture_FOS_diagram[beam_x]
             if FOS < minimum_FOS:
                 minimum_FOS = FOS
@@ -27,7 +31,7 @@ class CalculateFactorsOfSafety:
     def calculate_compressive_crushing_FOS_information(self):
         minimum_FOS = 1e9
         minimum_FOS_beam_x = 0
-        for beam_x in range(0, BRIDGE_LENGTH + 1):
+        for beam_x in range(0, SUPPORT_SPAN + 1):
             FOS = self.passage_simulation.compressive_crushing_FOS_diagram[beam_x]
             if FOS < minimum_FOS:
                 minimum_FOS = FOS
@@ -40,7 +44,7 @@ class CalculateFactorsOfSafety:
     def calculate_matboard_shear_failure_FOS_information(self):
         minimum_FOS = 1e9
         minimum_FOS_beam_x = 0
-        for beam_x in range(0, BRIDGE_LENGTH + 1):
+        for beam_x in range(0, SUPPORT_SPAN + 1):
             FOS = self.passage_simulation.matboard_shear_failure_FOS_diagram[beam_x]
             if FOS < minimum_FOS:
                 minimum_FOS = FOS
@@ -53,12 +57,64 @@ class CalculateFactorsOfSafety:
     def calculate_glue_shear_failure_FOS_information(self):
         minimum_FOS = 1e9
         minimum_FOS_beam_x = 0
-        for beam_x in range(0, BRIDGE_LENGTH + 1):
+        for beam_x in range(0, SUPPORT_SPAN + 1):
             FOS = self.passage_simulation.glue_shear_failure_FOS_diagram[beam_x]
             if FOS < minimum_FOS:
                 minimum_FOS = FOS
                 minimum_FOS_beam_x = beam_x
         self.passage_simulation.glue_shear_failure_FOS_information = {
+            "FOS": minimum_FOS,
+            "beam_x": minimum_FOS_beam_x
+        }
+
+    def calculate_local_buckling_case_1_FOS_information(self):
+        minimum_FOS = 1e9
+        minimum_FOS_beam_x = 0
+        for beam_x in range(0, SUPPORT_SPAN + 1):
+            FOS = self.passage_simulation.local_buckling_case_1_FOS_diagram[beam_x]
+            if FOS < minimum_FOS:
+                minimum_FOS = FOS
+                minimum_FOS_beam_x = beam_x
+        self.passage_simulation.local_buckling_case_1_FOS_information = {
+            "FOS": minimum_FOS,
+            "beam_x": minimum_FOS_beam_x
+        }
+
+    def calculate_local_buckling_case_2_FOS_information(self):
+        minimum_FOS = 1e9
+        minimum_FOS_beam_x = 0
+        for beam_x in range(0, SUPPORT_SPAN + 1):
+            FOS = self.passage_simulation.local_buckling_case_2_FOS_diagram[beam_x]
+            if FOS < minimum_FOS:
+                minimum_FOS = FOS
+                minimum_FOS_beam_x = beam_x
+        self.passage_simulation.local_buckling_case_2_FOS_information = {
+            "FOS": minimum_FOS,
+            "beam_x": minimum_FOS_beam_x
+        }
+
+    def calculate_local_buckling_case_3_FOS_information(self):
+        minimum_FOS = 1e9
+        minimum_FOS_beam_x = 0
+        for beam_x in range(0, SUPPORT_SPAN + 1):
+            FOS = self.passage_simulation.local_buckling_case_3_FOS_diagram[beam_x]
+            if FOS < minimum_FOS:
+                minimum_FOS = FOS
+                minimum_FOS_beam_x = beam_x
+        self.passage_simulation.local_buckling_case_3_FOS_information = {
+            "FOS": minimum_FOS,
+            "beam_x": minimum_FOS_beam_x
+        }
+
+    def calculate_local_buckling_case_4_FOS_information(self):
+        minimum_FOS = 1e9
+        minimum_FOS_beam_x = 0
+        for beam_x in range(0, SUPPORT_SPAN + 1):
+            FOS = self.passage_simulation.local_buckling_case_4_FOS_diagram[beam_x]
+            if FOS < minimum_FOS:
+                minimum_FOS = FOS
+                minimum_FOS_beam_x = beam_x
+        self.passage_simulation.local_buckling_case_4_FOS_information = {
             "FOS": minimum_FOS,
             "beam_x": minimum_FOS_beam_x
         }

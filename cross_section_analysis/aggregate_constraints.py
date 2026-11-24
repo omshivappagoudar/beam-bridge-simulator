@@ -40,3 +40,35 @@ class AggregateConstraints:
             end_beam_x = self.cross_section.end_beam_x,
             maximum_value = self.cross_section.max_V_before_glue_shear_failure
         )
+        
+        self.cross_section.constraints[CONSTRAINT_AGAINST_CASE_1_LOCAL_BUCKLING] = Constraint(
+            constraint_type = CONSTRAINT_AGAINST_CASE_1_LOCAL_BUCKLING,
+            constrained_variable = CONSTRAINT_ON_M,
+            start_beam_x = self.cross_section.start_beam_x,
+            end_beam_x = self.cross_section.end_beam_x,
+            maximum_value = self.cross_section.max_M_before_case_1_buckling
+        )
+        
+        self.cross_section.constraints[CONSTRAINT_AGAINST_CASE_2_LOCAL_BUCKLING] = Constraint(
+            constraint_type = CONSTRAINT_AGAINST_CASE_2_LOCAL_BUCKLING,
+            constrained_variable = CONSTRAINT_ON_M,
+            start_beam_x = self.cross_section.start_beam_x,
+            end_beam_x = self.cross_section.end_beam_x,
+            maximum_value = self.cross_section.max_M_before_case_2_buckling
+        )
+        
+        self.cross_section.constraints[CONSTRAINT_AGAINST_CASE_3_LOCAL_BUCKLING] = Constraint(
+            constraint_type = CONSTRAINT_AGAINST_CASE_3_LOCAL_BUCKLING,
+            constrained_variable = CONSTRAINT_ON_M,
+            start_beam_x = self.cross_section.start_beam_x,
+            end_beam_x = self.cross_section.end_beam_x,
+            maximum_value = self.cross_section.max_M_before_case_3_buckling
+        )
+        
+        self.cross_section.constraints[CONSTRAINT_AGAINST_CASE_4_LOCAL_BUCKLING] = Constraint(
+            constraint_type = CONSTRAINT_AGAINST_CASE_4_LOCAL_BUCKLING,
+            constrained_variable = CONSTRAINT_ON_V,
+            start_beam_x = self.cross_section.start_beam_x,
+            end_beam_x = self.cross_section.end_beam_x,
+            maximum_value = self.cross_section.max_V_before_case_4_buckling
+        )

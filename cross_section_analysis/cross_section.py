@@ -5,24 +5,25 @@ from cross_section_analysis.deduce_constraints.analyze_matboard_shear import *
 from cross_section_analysis.deduce_constraints.analyze_glue_shear import *
 from cross_section_analysis.deduce_constraints.analyze_tensile_stress import *
 from cross_section_analysis.deduce_constraints.analyze_compressive_stress import *
+from cross_section_analysis.deduce_constraints.analyze_local_buckling import *
 from cross_section_analysis.aggregate_constraints import *
 
 class CrossSection:
 
-    def __init__(self, pieces, glue_y_list, start_beam_x, end_beam_x, cross_section_id):
+    def __init__(self, pieces, glue_list, buckling_regions, start_beam_x, end_beam_x, cross_section_id):
         self.pieces = pieces
-        self.glue_y_list = glue_y_list
+        self.glue_list = glue_list
+        self.buckling_regions = buckling_regions
         self.start_beam_x = start_beam_x
         self.end_beam_x = end_beam_x
         self.cross_section_id = cross_section_id
-
-        self.calculate_cross_section_height()
 
         AnalyzeBeamProperties(self)
         AnalyzeMatboardShear(self)
         AnalyzeGlueShear(self)
         AnalyzeTensileStress(self)
         AnalyzeCompressiveStress(self)
+        AnalyzeLocalBuckling(self)
 
         AggregateConstraints(self)
 
@@ -34,11 +35,6 @@ class CrossSection:
 
     def get_moment_of_inertia(self):
         return self.moment_of_inertia
-
-    def calculate_cross_section_height(self):
-            self.cross_section_height = 0
-            for piece in self.pieces:
-                self.cross_section_height = max(self.cross_section_height, piece["y"] + piece["h"] / 2)
     
     def calculate_b(self, y):
         total_intersection = 0
